@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X線回折 実験手順書</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #181c27;
+    --card:      #1e2333;
+    --border:    #2a3050;
+    --accent:    #4fc3f7;
+    --accent2:   #7c83ff;
+    --warn:      #ffb74d;
+    --ok:        #81c784;
+    --text:      #e8eaf6;
+    --muted:     #8892b0;
+    --white:     #ffffff;
+    --step1:     #4fc3f7;
+    --step2:     #7c83ff;
+    --step3:     #f06292;
+    --step4:     #aed581;
+    --step5:     #ffb74d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 400;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  /* ── SIDEBAR NAV ── */
+  .nav {
+    position: fixed;
+    top: 0; left: 0;
+    width: 240px; height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    padding: 28px 0 40px;
+  }
+  .nav-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    color: var(--muted);
+    padding: 0 20px 16px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    transition: color .2s, background .2s;
+    border-left: 2px solid transparent;
+  }
+  .nav a:hover {
+    color: var(--text);
+    background: rgba(79,195,247,.06);
+    border-left-color: var(--accent);
+  }
+  .nav a .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--border);
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 240px;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 64px 60px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #0f1117 0%, #141829 60%, #181c27 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -80px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(79,195,247,.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    margin-bottom: 12px;
+  }
+  .hero h1 span {
+    color: var(--accent);
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 36px;
+  }
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--card);
+  }
+  .pill .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 56px 64px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    letter-spacing: -.01em;
+  }
+  .section h3 {
+    font-size: 17px;
+    font-weight: 500;
+    margin: 32px 0 12px;
+    color: var(--accent);
+  }
+
+  p { margin-bottom: 14px; color: var(--text); }
+
+  /* ── STEP CARDS ── */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .step-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px;
+    position: relative;
+    transition: border-color .2s;
+  }
+  .step-card:hover { border-color: var(--accent2); }
+  .step-card .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    margin-bottom: 8px;
+  }
+  .step-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .step-card p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.7;
+  }
+  .step-card .arrow {
+    position: absolute;
+    bottom: 18px; right: 20px;
+    font-size: 18px;
+    color: var(--border);
+  }
+
+  /* ── NUMBERED STEPS ── */
+  .proc {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .proc-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .proc-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent);
+    color: #000;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .proc-text {
+    font-size: 14.5px;
+    line-height: 1.75;
+    padding-top: 3px;
+  }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    display: flex;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 18px 0;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+  .callout.warn {
+    background: rgba(255,183,77,.08);
+    border: 1px solid rgba(255,183,77,.3);
+    color: #ffe0b2;
+  }
+  .callout.tip {
+    background: rgba(129,199,132,.08);
+    border: 1px solid rgba(129,199,132,.3);
+    color: #c8e6c9;
+  }
+  .callout .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── TOOL TABLE ── */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+  .tool-grid .th {
+    padding: 10px 18px;
+    background: var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .tool-grid .td {
+    padding: 14px 18px;
+    background: var(--card);
+    font-size: 13.5px;
+    border-top: 1px solid var(--border);
+  }
+  .tool-grid .td:first-of-type, .tool-grid .th:first-of-type { border-top: none; }
+  .tool-name {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* ── ANGLE TABLE ── */
+  table.angle {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13.5px;
+  }
+  table.angle th {
+    background: var(--border);
+    padding: 10px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-align: left;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  table.angle td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+  }
+  table.angle tr:last-child td { border-bottom: none; }
+  table.angle .mono {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent2);
+    font-weight: 700;
+  }
+  table.angle .deg {
+    font-family: 'Space Mono', monospace;
+    color: var(--ok);
+  }
+
+  /* ── MISTAKE TABLE ── */
+  .mistake-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .mistake-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 16px;
+    align-items: start;
+    font-size: 13.5px;
+  }
+  .mistake-item .label {
+    color: var(--warn);
+    font-weight: 700;
+    line-height: 1.6;
+  }
+  .mistake-item .fix {
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── BULLET LIST ── */
+  .blist {
+    list-style: none;
+    margin: 12px 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .blist li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .blist li::before {
+    content: '—';
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── STEP COLOR THEMES ── */
+  [data-step="0"] .proc-num { background: var(--step1); }
+  [data-step="1"] .proc-num { background: var(--step1); }
+  [data-step="2"] .proc-num { background: var(--step2); }
+  [data-step="3"] .proc-num { background: var(--step3); }
+  [data-step="4"] .proc-num { background: var(--step4); color: #1a2a1a; }
+  [data-step="5"] .proc-num { background: var(--step5); color: #2a1a00; }
+
+  [data-step="0"] h2 .accent, [data-step="1"] h2 .accent { color: var(--step1); }
+  [data-step="2"] h2 .accent { color: var(--step2); }
+  [data-step="3"] h2 .accent { color: var(--step3); }
+  [data-step="4"] h2 .accent { color: var(--step4); }
+  [data-step="5"] h2 .accent { color: var(--step5); }
+
+  .step-bar {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    margin-bottom: 12px;
+  }
+  [data-step="0"] .step-bar, [data-step="1"] .step-bar { background: rgba(79,195,247,.15); color: var(--step1); }
+  [data-step="2"] .step-bar { background: rgba(124,131,255,.15); color: var(--step2); }
+  [data-step="3"] .step-bar { background: rgba(240,98,146,.15); color: var(--step3); }
+  [data-step="4"] .step-bar { background: rgba(174,213,129,.15); color: var(--step4); }
+  [data-step="5"] .step-bar { background: rgba(255,183,77,.15); color: var(--step5); }
+
+  /* ── SUB-SECTION ── */
+  .subsec {
+    margin: 28px 0 0;
+    padding: 22px 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .subsec h3 { margin-top: 0; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .nav { display: none; }
+    .main { margin-left: 0; }
+    .hero, .section { padding: 40px 24px; }
+    .tool-grid { grid-template-columns: 1fr; }
+    .mistake-item { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="nav">
+  <div class="nav-title">X線回折 手順書</div>
+  <a href="#overview"><span class="badge">00</span>概要と原理</a>
+  <a href="#tools"><span class="badge">01</span>使用する道具</a>
+  <a href="#flow"><span class="badge">02</span>全体の流れ</a>
+  <a href="#step0"><span class="badge">S0</span>初期セットアップ</a>
+  <a href="#step1"><span class="badge">S1</span>回転角φを読む</a>
+  <a href="#step2"><span class="badge">S2</span>角度δを読む</a>
+  <a href="#step3"><span class="badge">S3</span>各点を描き込む</a>
+  <a href="#step4"><span class="badge">S4</span>指数付け</a>
+  <a href="#step5"><span class="badge">S5</span>角度の変更</a>
+  <a href="#mistakes"><span class="badge">!!</span>よくあるミス</a>
+  <a href="#table"><span class="badge">表</span>角度の参照表</a>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Experimental Procedure Manual</div>
+    <h1>X線回折<span>（ラウエ法）</span><br>実験手順書</h1>
+    <p class="hero-sub">グレニンガー図とウルフネットを使用して結晶の方位を解析する。初学者でも手順通りに進めれば迷わないように作成した完全版ガイドです。</p>
+    <div class="hero-pills">
+      <span class="pill"><span class="dot"></span>Mo線源を使用</span>
+      <span class="pill"><span class="dot" style="background:var(--accent2)"></span>グレニンガー図で角度読取</span>
+      <span class="pill"><span class="dot" style="background:var(--step3)"></span>ウルフネットに投影</span>
+      <span class="pill"><span class="dot" style="background:var(--step4)"></span>立方晶の指数付け</span>
+    </div>
+  </div>
+
+  <!-- 1. 概要 -->
+  <section class="section" id="overview">
+    <div class="section-label">Section 01</div>
+    <h2>実験の概要と原理</h2>
+
+    <h3>X線回折（ラウエ法）とは</h3>
+    <p>Mo（モリブデン）などの線源からX線を結晶に照射すると、結晶内の原子面で回折が起き、写真フィルム上に「ラウエ斑点」と呼ばれる点の集合として現れます。この斑点のパターンを解析することで、結晶の向きや面方位（指数）を知ることができます。</p>
+
+    <h3>晶帯（ゾーン）について</h3>
+    <p>特定の方向（晶帯軸）を共有する複数の結晶面を「晶帯（ゾーン）」と呼びます。</p>
+    <ul class="blist">
+      <li>晶帯による回折点は、写真フィルム上で<strong>双曲線状</strong>に並ぶ</li>
+      <li>その双曲線を解析することで晶帯軸の方向がわかる</li>
+      <li>複数の晶帯の交点から、最終的な結晶方位を決定できる</li>
+    </ul>
+
+    <h3>使用する2つの重要な道具</h3>
+    <div class="tool-grid">
+      <div class="th">道具</div><div class="th">役割・説明</div>
+      <div class="td"><span class="tool-name">グレニンガー図</span></div>
+      <div class="td">写真フィルム上の回折点の角度を読み取るための目盛り図。N軸目盛りは2°単位、双曲線の横方向（回転角）は1°単位で表示。</div>
+      <div class="td"><span class="tool-name">ウルフネット</span></div>
+      <div class="td">読み取った角度を立体投影面（球面）上に写し取るための等積投影網。目盛りは2°単位で表示。</div>
+    </div>
+  </section>
+
+  <!-- 2. 道具 -->
+  <section class="section" id="tools">
+    <div class="section-label">Section 02</div>
+    <h2>使用する道具・器具</h2>
+    <ul class="blist">
+      <li>X線回折写真（現像済みのフィルム）</li>
+      <li>グレニンガー図（透明シート）</li>
+      <li>ウルフネット（等積投影網）</li>
+      <li>投影図用紙（トレーシングペーパー等の半透明紙）</li>
+      <li>鉛筆・赤ペン</li>
+      <li>ピン（中心を固定するため）</li>
+      <li>分度器・定規</li>
+    </ul>
+    <div class="callout warn">
+      <span class="icon">⚠</span>
+      グレニンガー図・ウルフネット・投影図は重ねて使うため、全て同じサイズ・同じ中心で用意すること。
+    </div>
+  </section>
+
+  <!-- 3. フロー -->
+  <section class="section" id="flow">
+    <div class="section-label">Section 03</div>
+    <h2>全体の流れ</h2>
+    <div class="steps-grid">
+      <div class="step-card" data-step="0">
+        <div class="step-num" style="color:var(--step1)">STEP 0</div>
+        <h4>初期セットアップ</h4>
+        <p>写真・グレニンガー図・ウルフネット・投影図の中心を合わせ、N極を上に揃える。</p>
+        <span class="arrow">→</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num" style="color:var(--step1)">STEP 1</div>
+        <h4>回転角 φ を読む</h4>
+        <p>写真の双曲線（晶帯）を探し、グレニンガー図に合わせて写真を回転させ、回転角φを読む。</p>
+        <span class="arrow">→</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num" style="color:var(--step2)">STEP 2</div>
+        <h4>角度 δ を読んで投影図に描く</h4>
+        <p>赤道面から双曲線までの角度δを読み、ウルフネットに円弧と晶帯軸の点を描く。</p>
+        <span class="arrow">→</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num" style="color:var(--step3)">STEP 3</div>
+        <h4>各回折点を描き込む</h4>
+        <p>写真上の各回折点の位置をグレニンガーで読み取り、ウルフネットの円弧上に点を打つ。</p>
+        <span class="arrow">→</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num" style="color:var(--step4)">STEP 4</div>
+        <h4>指数付け</h4>
+        <p>投影図上の点間の角度をウルフネットで読み、立方晶の角度表と照合して指数を決定する。</p>
+        <span class="arrow">→</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num" style="color:var(--step5)">STEP 5</div>
+        <h4>角度の変更（必要に応じて）</h4>
+        <p>対称性の良い軸を写真中央に再配置し、ゴニオメーターで結晶を回転させて再解析する。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 0 -->
+  <section class="section" id="step0" data-step="0">
+    <div class="section-label">Procedure</div>
+    <div class="step-bar">STEP 0</div>
+    <h2><span class="accent">初期セットアップ</span></h2>
+    <p>写真、グレニンガー図、ウルフネット、投影図の向きと中心を統一し、解析のベースを作ります。</p>
+
+    <div class="proc">
+      <div class="proc-item">
+        <div class="proc-num">1</div>
+        <div class="proc-text">X線回折写真を平らな台に置く。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">2</div>
+        <div class="proc-text">投影図用紙を写真の上に重ね、中心（ビームストップの中心）を合わせる。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">3</div>
+        <div class="proc-text">N極（上方向の基準）を上に揃える。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">4</div>
+        <div class="proc-text">グレニンガー図の中心を写真・投影図の中心に合わせ、同様にN極を上に揃える。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">5</div>
+        <div class="proc-text">ウルフネットも同じく中心とN極を合わせて重ねる。</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠</span>
+      全ての図のN極の向きが一致していないと、その後の角度読み取りがすべてずれてしまいます。最初のセットアップを慎重に行ってください。
+    </div>
+    <div class="callout tip">
+      <span class="icon">✓</span>
+      ピンで中心を刺して固定すると、回転させても中心がずれません。
+    </div>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="section" id="step1" data-step="1">
+    <div class="section-label">Procedure</div>
+    <div class="step-bar">STEP 1</div>
+    <h2><span class="accent">晶帯を探し、回転角 φ を読む</span></h2>
+    <p>写真上の回折点の双曲線（晶帯）を見つけ、グレニンガー図でその回転角φを読み取ります。</p>
+
+    <div class="proc">
+      <div class="proc-item">
+        <div class="proc-num">1</div>
+        <div class="proc-text">写真上で、<strong>双曲線状に並ぶ回折点のグループ（晶帯）</strong>を目で探す。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">2</div>
+        <div class="proc-text">グレニンガー図のN極を上に固定したまま、写真の中心とグレニンガー図の中心を一致させたまま、<strong>写真だけをゆっくり回転させる</strong>。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">3</div>
+        <div class="proc-text">写真上の双曲線が、グレニンガー図上のいずれかの曲線に<strong>重なる（または沿う）ところで止める</strong>。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">4</div>
+        <div class="proc-text">グレニンガー図のN軸から写真のN軸が回転した角度 <strong>φ（ファイ）</strong>を読む。</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠</span>
+      グレニンガー図の曲線は1°おきに引かれています。写真の双曲線上の点が、できるだけ多くグレニンガーの1本の線に乗るように回転させてください。
+    </div>
+    <div class="callout tip">
+      <span class="icon">✓</span>
+      双曲線の左右の対称性が良い位置でとめると、より正確なφが読めます。
+    </div>
+
+    <div class="subsec">
+      <h3>この操作のポイント</h3>
+      <ul class="blist">
+        <li>グレニンガー図は動かさない（N極を上に固定）</li>
+        <li>写真を中心を軸として回転させる</li>
+        <li>双曲線全体がグレニンガーの1本の曲線に乗るように調整する</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="section" id="step2" data-step="2">
+    <div class="section-label">Procedure</div>
+    <div class="step-bar">STEP 2</div>
+    <h2><span class="accent">赤道面からの角度 δ を読む</span></h2>
+    <p>晶帯が赤道面から何度傾いているか（δ）を読み取り、ウルフネットに晶帯の情報を描き込みます。この作業はA・B・Cの3つに分かれます。</p>
+
+    <div class="subsec">
+      <h3>作業 A ： δ（デルタ）を読む</h3>
+      <div class="proc">
+        <div class="proc-item">
+          <div class="proc-num">1</div>
+          <div class="proc-text">STEP 1で合わせたまま、グレニンガー図の<strong>N軸の目盛り</strong>を使って「赤道面（0の線）から双曲線の頂点まで」の角度δを読む。</div>
+        </div>
+      </div>
+      <div class="callout warn">
+        <span class="icon">⚠</span>
+        グレニンガーの赤道面とはN–S軸に直交する水平線のことです。この線から双曲線の最も赤道に近い部分（頂点）までの距離がδです。
+      </div>
+    </div>
+
+    <div class="subsec">
+      <h3>作業 B ： ウルフネットに δ の円弧を描く</h3>
+      <div class="proc">
+        <div class="proc-item">
+          <div class="proc-num">1</div>
+          <div class="proc-text">投影図とウルフネットの中心を一致させたまま、<strong>投影図のN軸を同じ方向に同じ角度φだけ回転させる</strong>（STEP 1で読んだφと同じ値）。</div>
+        </div>
+        <div class="proc-item">
+          <div class="proc-num">2</div>
+          <div class="proc-text">ウルフネットのN軸の目盛りでδの位置を見つける。</div>
+        </div>
+        <div class="proc-item">
+          <div class="proc-num">3</div>
+          <div class="proc-text">そのδの位置を起点として、E（東）とW（西）に向かって、<strong>ウルフネットの等角度線に沿って円弧を描く</strong>。</div>
+        </div>
+      </div>
+      <div class="callout tip">
+        <span class="icon">✓</span>
+        ウルフネットには東西方向に走る等角度線（緯度線のような曲線）があります。δの位置の緯度線をなぞるように円弧を描きます。
+      </div>
+    </div>
+
+    <div class="subsec">
+      <h3>作業 C ： 晶帯軸の点を打つ</h3>
+      <div class="proc">
+        <div class="proc-item">
+          <div class="proc-num">1</div>
+          <div class="proc-text">ウルフネットの<strong>S極（一番下の点）から赤道方向（上方向）にδだけ離れた位置</strong>に点を打つ。</div>
+        </div>
+      </div>
+      <div class="callout tip">
+        <span class="icon">✓</span>
+        この点が「晶帯軸」の方向を表します。S極から数えてδ目盛り分だけ上に移動した位置です。N軸上ではなく、S極から直接数えてください。
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="section" id="step3" data-step="3">
+    <div class="section-label">Procedure</div>
+    <div class="step-bar">STEP 3</div>
+    <h2><span class="accent">各回折点をウルフネットに描く</span></h2>
+    <p>写真上の個々の回折点（ラウエ斑点）の角度をグレニンガーで読み取り、ウルフネットの円弧上に点として描き込みます。</p>
+
+    <div class="proc">
+      <div class="proc-item">
+        <div class="proc-num">1</div>
+        <div class="proc-text">STEP 1と同じ状態（写真をφだけ回転させた状態）のまま、写真上の各回折点について、<strong>グレニンガーの双曲線の横軸方向の目盛り</strong>を読む。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">2</div>
+        <div class="proc-text">STEP 2で描いた円弧（δの位置の円弧）の上で、読み取った横軸目盛りの位置に<strong>点を打つ</strong>。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">3</div>
+        <div class="proc-text">写真上の晶帯内のすべての回折点について、同様に繰り返す。</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠</span>
+      1つの晶帯内のすべての点は同じδの円弧の上に乗ります。横軸方向の読み値（位置）だけが変わります。
+    </div>
+    <div class="callout tip">
+      <span class="icon">✓</span>
+      グレニンガーの横軸の目盛りは双曲線の形状に対応しています。双曲線の縦方向の位置がδ、横方向の読み値がその点の投影位置を表します。
+    </div>
+
+    <div class="subsec">
+      <h3>完成後の確認</h3>
+      <ul class="blist">
+        <li>晶帯が赤道上にある場合：晶帯軸の点は円弧の中心付近に来る</li>
+        <li>晶帯が赤道からδ傾いている場合：晶帯軸の点はS極方向にδだけずれた位置に来る</li>
+        <li>対称性が良い場合、1つの晶帯軸の点が他の晶帯の円弧上に乗る（解析が正しいサイン）</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="section" id="step4" data-step="4">
+    <div class="section-label">Procedure</div>
+    <div class="step-bar">STEP 4</div>
+    <h2><span class="accent">指数付け</span></h2>
+    <p>投影図上に描いた点（晶帯軸）に [100]、[110]、[111] などの結晶学的指数を割り当てます。</p>
+
+    <h3>2点間の角度の読み方</h3>
+    <div class="proc">
+      <div class="proc-item">
+        <div class="proc-num">1</div>
+        <div class="proc-text">投影図とウルフネットの中心を一致させたまま回転させ、<strong>2つの回折点が同じウルフネットのカーブ（緯度線）に乗る位置</strong>を探す。どちらの点を動かしてもよい。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">2</div>
+        <div class="proc-text">2点が同じカーブ上に来たとき、そのカーブ上の<strong>目盛りで2点間の角度を読む</strong>。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">3</div>
+        <div class="proc-text">この値を下の表の「面間の角度」と比較して、2点の指数を決定する。</div>
+      </div>
+    </div>
+
+    <h3>立方晶の指数と角度の表</h3>
+    <table class="angle">
+      <thead>
+        <tr><th>基準</th><th>比較</th><th>面間の角度（°）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">[100]</td><td class="mono">[100]</td><td class="deg">90</td></tr>
+        <tr><td class="mono">[100]</td><td class="mono">[110]</td><td class="deg">45, 90</td></tr>
+        <tr><td class="mono">[100]</td><td class="mono">[111]</td><td class="deg">55</td></tr>
+        <tr><td class="mono">[110]</td><td class="mono">[110]</td><td class="deg">60, 90</td></tr>
+        <tr><td class="mono">[110]</td><td class="mono">[111]</td><td class="deg">35, 90</td></tr>
+        <tr><td class="mono">[111]</td><td class="mono">[111]</td><td class="deg">71</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn">
+      <span class="icon">⚠</span>
+      詳細な角度値については教科書の表を参照すること。上記は代表的な値のみを示しています。
+    </div>
+
+    <div class="subsec">
+      <h3>3点を使った指数付けの方法（推奨）</h3>
+      <p>1点ずつ比較するよりも、<strong>3点まとめて確認する方がミスを減らせます</strong>。</p>
+      <div class="proc">
+        <div class="proc-item">
+          <div class="proc-num">1</div>
+          <div class="proc-text">投影図上で晶帯の交点が作る<strong>三角形の頂点となる3点</strong>を探す。</div>
+        </div>
+        <div class="proc-item">
+          <div class="proc-num">2</div>
+          <div class="proc-text">3点間すべての角度をウルフネットで読む。</div>
+        </div>
+        <div class="proc-item">
+          <div class="proc-num">3</div>
+          <div class="proc-text">例：<strong>71°、45°、35°</strong> の三角形 → <span style="color:var(--accent2);font-family:'Space Mono',monospace">[111]、[100]、[110]</span> に対応。</div>
+        </div>
+        <div class="proc-item">
+          <div class="proc-num">4</div>
+          <div class="proc-text">3点の組み合わせが表の値に矛盾なく合えば、その指数付けが正しい。</div>
+        </div>
+        <div class="proc-item">
+          <div class="proc-num">5</div>
+          <div class="proc-text">3点の指数が決まったら、それらを基準に<strong>他の点の指数も順次決定</strong>する。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="section" id="step5" data-step="5">
+    <div class="section-label">Procedure</div>
+    <div class="step-bar">STEP 5</div>
+    <h2><span class="accent">角度の変更（対称軸を中心に合わせる）</span></h2>
+    <p>指数付けが終わったら、対称性の良い軸（例：[100]、[110]、[111]など）を写真の中央に合わせることで、より鮮明な回折パターンを得られます。</p>
+
+    <div class="proc">
+      <div class="proc-item">
+        <div class="proc-num">1</div>
+        <div class="proc-text">投影図上で<strong>対称性の良い点</strong>（多くの晶帯が通過している点）を1つ選ぶ。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">2</div>
+        <div class="proc-text">その点から<strong>赤道方向とN軸方向の角度（α、β）</strong>を読む。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">3</div>
+        <div class="proc-text">実際の結晶を取り付けている<strong>ゴニオメーター</strong>を操作し、αとβの値だけ結晶を回転させる。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">4</div>
+        <div class="proc-text">この状態で再度X線回折写真を撮影する。</div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">5</div>
+        <div class="proc-text">対称軸が中央に来た写真では、晶帯が<strong>極（中心）や赤道（水平線）の円</strong>として現れる。</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠</span>
+      ゴニオメーターのα方向とβ方向については機器のマニュアルを確認してください。
+    </div>
+    <div class="callout tip">
+      <span class="icon">✓</span>
+      中央の点の指数がわかっている場合は、そこから他の交点や軸までの角度をウルフネットで読み取り、順次指数付けを行うことができます。
+    </div>
+  </section>
+
+  <!-- よくあるミス -->
+  <section class="section" id="mistakes">
+    <div class="section-label">Troubleshooting</div>
+    <h2>よくあるミスと注意点</h2>
+
+    <div class="mistake-list">
+      <div class="mistake-item">
+        <div class="label">⚠ N極の向きがずれている</div>
+        <div class="fix">すべての図でN極が上を向いているか確認する。最初のセットアップ時に慎重に合わせること。</div>
+      </div>
+      <div class="mistake-item">
+        <div class="label">⚠ 中心がずれている</div>
+        <div class="fix">ピンや固定具を使って中心を固定する。回転のたびに中心がずれないか確認する。</div>
+      </div>
+      <div class="mistake-item">
+        <div class="label">⚠ φとδを混同する</div>
+        <div class="fix">φは写真を回転させた角度（水平方向）、δは双曲線の赤道面からの距離（垂直方向）。役割が全く異なります。</div>
+      </div>
+      <div class="mistake-item">
+        <div class="label">⚠ 双曲線の選択を間違える</div>
+        <div class="fix">回折点が多く乗る双曲線を選ぶ。点が2〜3個しか乗らない場合は別の双曲線を試す。</div>
+      </div>
+      <div class="mistake-item">
+        <div class="label">⚠ 角度表の値と大きく異なる</div>
+        <div class="fix">別の3点の組み合わせで試す。また、1つの角度が複数の指数の組み合わせで一致することがあるため、必ず3点で同時に検証する。</div>
+      </div>
+      <div class="mistake-item">
+        <div class="label">⚠ S極からのδの方向を間違える</div>
+        <div class="fix">S極から赤道方向（上方向）に向かってδ目盛り分だけ数える。下（S極の外側）に向かってはいけない。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 参考表 -->
+  <section class="section" id="table">
+    <div class="section-label">Reference</div>
+    <h2>参考：立方晶の指数と面間角度</h2>
+    <p>詳細は教科書の表を参照すること。指数付けの際の照合に使用します。</p>
+    <table class="angle">
+      <thead>
+        <tr><th>方向 1</th><th>方向 2</th><th>角度（°）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">[100]</td><td class="mono">[100]</td><td class="deg">90</td></tr>
+        <tr><td class="mono">[100]</td><td class="mono">[110]</td><td class="deg">45, 90</td></tr>
+        <tr><td class="mono">[100]</td><td class="mono">[111]</td><td class="deg">54.7 ≈ 55</td></tr>
+        <tr><td class="mono">[110]</td><td class="mono">[110]</td><td class="deg">60, 90</td></tr>
+        <tr><td class="mono">[110]</td><td class="mono">[111]</td><td class="deg">35.3 ≈ 35, 90</td></tr>
+        <tr><td class="mono">[111]</td><td class="mono">[111]</td><td class="deg">70.5 ≈ 71</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted);font-size:13px;margin-top:8px">立方晶系（FCC・BCC・Diamond構造など）はすべてこの表が使えます。</p>
+
+    <div style="margin-top:48px;padding-top:24px;border-top:1px solid var(--border);color:var(--muted);font-size:12px">
+      この手順書は資料画像をもとに初学者向けに作成しています。細部については指導教員の指示に従ってください。
+    </div>
+  </section>
+
+</div><!-- /main -->
+
+</body>
+</html>
